@@ -25,7 +25,7 @@ jobs:
         }
 
     - name: Build Win32 DLL
-      # 指向 Explorer++/Explorer++.sln，並指定正確的 target
+      # 32 位元通常在 .sln 中已有定義，直接編譯方案檔最保險
       run: |
         msbuild "Explorer++/Explorer++.sln" `
           -t:Translations\Explorer++ZH_TW `
@@ -34,17 +34,18 @@ jobs:
           -p:PlatformToolset=v143
 
     - name: Build x64 DLL
+      # 直接編譯專案檔，並手動指定 SolutionDir 以便找到 Toolset.props
+      # 使用 $env:GITHUB_WORKSPACE 取得絕對路徑
       run: |
-        msbuild "Explorer++/Explorer++.sln" `
-          -t:Translations\Explorer++ZH_TW `
+        msbuild "Translations/Explorer++ZH_TW/Explorer++ZH_TW.vcxproj" `
           -p:Configuration=Release `
           -p:Platform=x64 `
-          -p:PlatformToolset=v143
+          -p:PlatformToolset=v143 `
+          -p:SolutionDir="$env:GITHUB_WORKSPACE/Explorer++/"
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Explorer++-Traditional-Chinese-DLLs
         path: |
-          **/Win32/Release/Explorer++ZH_TW.dll
-          **/x64/Release/Explorer++ZH_TW.dll
+          **/Explorer++ZH_TW.dll
