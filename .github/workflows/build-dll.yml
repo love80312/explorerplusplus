@@ -25,18 +25,18 @@ jobs:
         }
 
     - name: Build Win32 DLL
-      # 改為編譯 .sln，並用 -t (target) 指定翻譯專案
+      # 指向 Explorer++/Explorer++.sln，並指定正確的 target
       run: |
-        msbuild Explorer++.sln `
-          -t:Translations\Explorer++ZH_TW\Explorer++ZH_TW `
+        msbuild "Explorer++/Explorer++.sln" `
+          -t:Translations\Explorer++ZH_TW `
           -p:Configuration=Release `
           -p:Platform=Win32 `
           -p:PlatformToolset=v143
 
     - name: Build x64 DLL
       run: |
-        msbuild Explorer++.sln `
-          -t:Translations\Explorer++ZH_TW\Explorer++ZH_TW `
+        msbuild "Explorer++/Explorer++.sln" `
+          -t:Translations\Explorer++ZH_TW `
           -p:Configuration=Release `
           -p:Platform=x64 `
           -p:PlatformToolset=v143
