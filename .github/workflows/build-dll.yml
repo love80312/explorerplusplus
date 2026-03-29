@@ -2,8 +2,8 @@ name: Build Explorer++ Language DLL
 
 on:
   push:
-    branches: [ "**" ]  # 讓所有分支的推送都直接觸發，不需要等待 PR 合併
-  workflow_dispatch:      # 保留手動觸發按鈕
+    branches: [ "**" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -25,12 +25,21 @@ jobs:
         }
 
     - name: Build Win32 DLL
+      # 改為編譯 .sln，並用 -t (target) 指定翻譯專案
       run: |
-        msbuild "Translations/Explorer++ZH_TW/Explorer++ZH_TW.vcxproj" -p:Configuration=Release -p:Platform=Win32 -p:PlatformToolset=v143
+        msbuild Explorer++.sln `
+          -t:Translations\Explorer++ZH_TW\Explorer++ZH_TW `
+          -p:Configuration=Release `
+          -p:Platform=Win32 `
+          -p:PlatformToolset=v143
 
     - name: Build x64 DLL
       run: |
-        msbuild "Translations/Explorer++ZH_TW/Explorer++ZH_TW.vcxproj" -p:Configuration=Release -p:Platform=x64 -p:PlatformToolset=v143
+        msbuild Explorer++.sln `
+          -t:Translations\Explorer++ZH_TW\Explorer++ZH_TW `
+          -p:Configuration=Release `
+          -p:Platform=x64 `
+          -p:PlatformToolset=v143
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
