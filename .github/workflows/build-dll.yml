@@ -1,0 +1,41 @@
+name: Build Explorer++ Language DLL
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Bootstrap vcpkg
+      run: |
+        if (Test-Path "Explorer++/ThirdParty/vcpkg/bootstrap-vcpkg.bat") {
+          ./Explorer++/ThirdParty/vcpkg/bootstrap-vcpkg.bat
+        }
+
+    - name: Build Win32 DLL
+      run: |
+        msbuild Explorer++ZH_TW.vcxproj -p:Configuration=Release -p:Platform=Win32 -p:PlatformToolset=v143
+
+    - name: Build x64 DLL
+      run: |
+        msbuild Explorer++ZH_TW.vcxproj -p:Configuration=Release -p:Platform=x64 -p:PlatformToolset=v143
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: Explorer++-Traditional-Chinese-DLLs
+        path: |
+          **/Win32/Release/Explorer++ZH_TW.dll
+          **/x64/Release/Explorer++ZH_TW.dll
