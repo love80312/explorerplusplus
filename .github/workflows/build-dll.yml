@@ -1,0 +1,43 @@
+name: Build Explorer++ Language DLL
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+  workflow_dispatch: # 允許手動觸發
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive # 自動拉取 vcpkg 等子模組
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Bootstrap vcpkg
+      run: |
+        ./Explorer++/ThirdParty/vcpkg/bootstrap-vcpkg.bat
+
+    - name: Restore NuGet packages
+      run: msbuild Explorer++\Explorer++.sln -t:Restore -p:Configuration=Release
+
+    - name: Build Solution (Release x64)
+      run: |
+        msbuild Explorer++\Explorer++.sln `
+          -target:Explorer++ZH_TW `
+          -property:Configuration=Release `
+          -property:Platform=x64 `
+          -property:PlatformToolset=v143
+
+    - name: Upload DLL Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Explorer++ZH_TW-DLL-x64
+        path: |
+          **/Release/Explorer++ZH_TW.dll
